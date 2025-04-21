@@ -1,3 +1,170 @@
+/* Стили для формы */
+.booking-form {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 30px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #333;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: inherit;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #ff6b8b;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255,107,139,0.2);
+}
+
+/* Стили для кнопки */
+.btn {
+    background: #ff6b8b;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.btn:hover {
+    background: #e05d7b;
+    transform: translateY(-3px);
+}
+
+.btn[disabled] {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Спиннер загрузки */
+.spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s linear infinite;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Сообщения об ошибках */
+.form-error {
+    background: #ffeeee;
+    color: #d32f2f;
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #ffcdd2;
+    display: flex;
+    align-items: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.form-error i {
+    margin-right: 10px;
+}
+
+/* Уведомления */
+.alert {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    max-width: 400px;
+    background: white;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    border-radius: 8px;
+    overflow: hidden;
+    z-index: 10000;
+    transform: translateY(100px);
+    opacity: 0;
+    animation: alertIn 0.3s ease forwards;
+}
+
+.alert-success {
+    border-left: 4px solid #4caf50;
+}
+
+.alert-error {
+    border-left: 4px solid #f44336;
+}
+
+.alert-content {
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+}
+
+.alert-content i {
+    margin-right: 10px;
+    font-size: 1.2em;
+}
+
+.alert-close {
+    background: none;
+    border: none;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 1.2em;
+    cursor: pointer;
+    color: #666;
+}
+
+.fade-out {
+    animation: alertOut 0.3s ease forwards;
+}
+
+@keyframes alertIn {
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes alertOut {
+    to { transform: translateY(100px); opacity: 0; }
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .booking-form {
+        padding: 20px;
+    }
+    
+    .alert {
+        left: 20px;
+        right: 20px;
+        max-width: none;
+    }
+}
 /* Общие стили */
 :root {
     --primary-color: #ff6b8b;
