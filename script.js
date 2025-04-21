@@ -119,3 +119,35 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('load', animateOnScroll);
     window.addEventListener('scroll', animateOnScroll);
 });
+// Форма записи
+const bookingForm = document.getElementById('bookingForm');
+if (bookingForm) {
+    bookingForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        
+        fetch('telegram.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            const modal = document.querySelector('.booking-success-modal');
+            modal.querySelector('h3').textContent = data.success ? 'Успешно!' : 'Ошибка';
+            modal.querySelector('p').textContent = data.message;
+            modal.classList.add('active');
+            
+            if (data.success) {
+                this.reset(); // Очищаем форму
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+            const modal = document.querySelector('.booking-success-modal');
+            modal.querySelector('h3').textContent = 'Ошибка';
+            modal.querySelector('p').textContent = 'Не удалось отправить заявку. Позвоните нам.';
+            modal.classList.add('active');
+        });
+    });
+}
