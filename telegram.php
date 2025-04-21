@@ -1,82 +1,56 @@
 <?php
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-header('Content-Type: text/plain'); // Упростим вывод
+header('Content-Type: application/json');
+header("Access-Control-Allow-Origin: *");
 
-// Получаем данные из формы
-$name = $_POST['name'] ?? '';
-$phone = $_POST['phone'] ?? '';
-$email = $_POST['email'] ?? '';
-$service = $_POST['service'] ?? '';
-$date = $_POST['date'] ?? '';
-$time = $_POST['time'] ?? '';
-$notes = $_POST['notes'] ?? '';
+// Логирование
+file_put_contents('form_log.txt', date('Y-m-d H:i:s')." - Старт\n", FILE_APPEND);
 
-// Проверяем обязательные поля
-if (empty($name) || empty($phone)) {
-    echo json_encode(['success' => false, 'message' => 'Заполните имя и телефон']);
+// Получаем данные
+$input = file_get_contents('php://input');
+$data = json_decode($input, true) ?: $_POST;
+file_put_contents('form_log.txt', print_r($data, true), FILE_APPEND);
+
+// Проверка данных
+if (empty($data['name']) || empty($data['phone'])) {
+    $error = 'Заполните имя и телефон';
+    file_put_contents('form_log.txt', $error."\n", FILE_APPEND);
+    echo json_encode(['success' => false, 'message' => $error]);
     exit;
 }
 
-// Формируем сообщение для Telegram
-$message = "🎉 *Новая запись!*\n\n";
-$message .= "👤 *Имя:* $name\n";
-$message .= "📞 *Телефон:* `$phone`\n";
-if (!empty($email)) $message .= "📧 *Email:* $email\n";
-if (!empty($service)) $message .= "💅 *Услуга:* $service\n";
-if (!empty($date)) $message .= "📅 *Дата:* $date\n";
-if (!empty($time)) $message .= "⏰ *Время:* $time\n";
-if (!empty($notes)) $message .= "✏️ *Пожелания:* $notes";
+// Настройки бота
+$botToken = 'ВАШ_ТОКЕН'; // Например: '1234567890:ABCdefGHIJKlmNoPQRSTuVWXYZ'
+$chatId = 'ВАШ_CHAT_ID'; // Например: '584902187'
+$message = "📌 Новая запись:\n👤 Имя: {$data['name']}\n📞 Телефон: {$data['phone']}";
 
-
-$botToken = '7896695898:AAHOe0mIRVNweYoRSQ9z9E_si0y4YnIp9mA';
-$chatId = '5421268585';
+// Отправка в Telegram
 $url = "https://api.telegram.org/bot$botToken/sendMessage";
-$url = "https://api.telegram.org/bot$botToken/sendMessage";
-$data = [
-    'chat_id' => $chatId,
-    'text' => '✅ Бот работает! ' . date('Y-m-d H:i:s')
-];
-
-$options = [
-    'http' => [
-        'header' => "Content-type: application/x-www-form-urlencoded\r\n",
-        'method' => 'POST',
-        'content' => http_build_query($data)
-    ]
-];
-
-$context = stream_context_create($options);
-$result = file_get_contents($url, false, $context);
-
-header('Content-Type: application/json');
-echo json_encode([
-    'status' => $result ? 'success' : 'error',
-    'response' => $result ? json_decode($result, true) : error_get_last()
-]);
-
-// Отправляем данные в Telegram
-$data = [
+$postData = [
     'chat_id' => $chatId,
     'text' => $message,
-    'parse_mode' => 'Markdown',
-    'disable_web_page_preview' => true
+    'parse_mode' => 'HTML'
 ];
 
-$options = [
-    'http' => [
-        'header' => "Content-type: application/x-www-form-urlencoded\r\n",
-        'method' => 'POST',
-        'content' => http_build_query($data)
-    ]
-];
+// Используем cURL вместо file_get_contents
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL, $url);
+curl_setopt($ch, CURLOPT_POST, true);
+curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Только для теста!
 
-$context = stream_context_create($options);
-$result = file_get_contents($url, false, $context);
+$response = curl_exec($ch);
+$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+curl_close($ch);
 
-if ($result) {
-    echo json_encode(['success' => true, 'message' => 'Запись отправлена! Мы скоро свяжемся.']);
+// Логируем ответ
+file_put_contents('form_log.txt', "Response ($httpCode): $response\n", FILE_APPEND);
+
+if ($httpCode == 200 && json_decode($response)->ok) {
+    echo json_encode(['success' => true, 'message' => 'Запись успешно отправлена!']);
 } else {
-    echo json_encode(['success' => false, 'message' => 'Ошибка. Попробуйте позже или позвоните нам.']);
+    $error = 'Ошибка отправки: '.$response;
+    file_put_contents('form_log.txt', $error."\n", FILE_APPEND);
+    echo json_encode(['success' => false, 'message' => $error]);
 }
 ?>
