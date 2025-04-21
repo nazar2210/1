@@ -1,6 +1,7 @@
 <?php
-header('Content-Type: application/json');
-
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+header('Content-Type: text/plain'); // Упростим вывод
 // Получаем данные из формы
 $name = $_POST['name'] ?? '';
 $phone = $_POST['phone'] ?? '';
