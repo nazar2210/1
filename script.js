@@ -150,4 +150,9 @@ if (bookingForm) {
             modal.classList.add('active');
         });
     });
+fetch('telegram.php', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+    body: 'name=Test&phone=79990000000'
+  })
 }
