@@ -28,7 +28,7 @@ if (!empty($time)) $message .= "⏰ *Время:* $time\n";
 if (!empty($notes)) $message .= "✏️ *Пожелания:* $notes";
 
 // Настройки бота
-$botToken = '7896695898:AAEoi0Kk2da_lRQejxYUJkT1amZo1Hyo3vw';
+$botToken = '7896695898:AAHOe0mIRVNweYoRSQ9z9E_si0y4YnIp9mA';
 $chatId = '5421268585';
 $url = "https://api.telegram.org/bot$botToken/sendMessage";
 
