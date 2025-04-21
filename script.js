@@ -1,40 +1,45 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const bookingForm = document.getElementById('bookingForm');
+document.getElementById('bookingForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
     
-    if (bookingForm) {
-        bookingForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(this);
-            const submitBtn = this.querySelector('button[type="submit"]');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Отправка...';
-            
-            try {
-                const response = await fetch('telegram.php', {
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: new URLSearchParams(formData)
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    alert('✅ ' + result.message);
-                    this.reset();
-                } else {
-                    alert('❌ ' + (result.message || 'Ошибка отправки'));
-                }
-            } catch (error) {
-                console.error('Ошибка:', error);
-                alert('❌ Произошла ошибка. Пожалуйста, позвоните нам.');
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Записаться';
-            }
+    const form = this;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const errorMsg = document.createElement('div');
+    errorMsg.className = 'error-message';
+    
+    // Очистка предыдущих ошибок
+    document.querySelectorAll('.error-message').forEach(el => el.remove());
+    
+    // Блокировка кнопки
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner"></span> Отправка...';
+    
+    try {
+        const formData = new FormData(form);
+        const response = await fetch('telegram.php', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json'
+            },
+            body: formData
         });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert(result.message);
+            form.reset();
+        } else {
+            errorMsg.textContent = result.message || 'Произошла ошибка';
+            errorMsg.style.color = 'red';
+            form.insertBefore(errorMsg, submitBtn);
+        }
+    } catch (error) {
+        console.error('Ошибка:', error);
+        errorMsg.textContent = 'Сбой соединения. Позвоните нам: +7 (999) 141-70-17';
+        errorMsg.style.color = 'red';
+        form.insertBefore(errorMsg, submitBtn);
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Записаться';
     }
 });
